@@ -1,9 +1,9 @@
 
-<h1>Analog Clock Project<h1/>
+<h1>Analog Clock Project</h1>
 
 This project is a simple yet elegant analog clock created using HTML, CSS, and JavaScript. It provides a visually appealing representation of time, with hour, minute, and second hands dynamically updating in real-time.
 
-<h1>Features:<h1/>
+<h1>Features:</h1>h1>
 Smooth ticking motion of clock hands.
 Responsive design for optimal viewing on various devices.
 Clean and minimalistic interface.
