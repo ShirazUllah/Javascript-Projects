@@ -6,7 +6,7 @@ Elevate your web presence with the Auto Effect Animation project,<br> a stunning
 Seamless and automatic animation transitions.<br>
 Engaging visual effects that capture attention.<br>
 Customizable to integrate effortlessly with your website's design.<br>
-<h1>>Technologies Used:</h1
+<h1>Technologies Used:</h1
 HTML5 for solid structure.<br>
 CSS3 for sleek styling and layout.<br>
 JavaScript for creating the captivating auto-animation effect.<br>
