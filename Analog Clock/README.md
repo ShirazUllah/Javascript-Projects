@@ -7,6 +7,7 @@ This project is a simple yet elegant analog clock created using HTML, CSS, and J
 Smooth ticking motion of clock hands.
 Responsive design for optimal viewing on various devices.
 Clean and minimalistic interface.
+  <br>
 <h1>Technologies Used:</h1>
 HTML5 for structure.
 CSS3 for styling and layout.
