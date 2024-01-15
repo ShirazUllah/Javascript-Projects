@@ -21,7 +21,18 @@ body {
     letter-spacing: 4px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
   }
-  
+
+/* footer */
+
+.footer {
+    /* display: block; */
+    color: #ffffff;
+    text-align: center;
+    margin: auto 0;
+    position: absolute;
+    bottom: 0;
+    padding: 15px 0;
+}
   .btn {
     padding: 10px 20px;
     width: 200px;
