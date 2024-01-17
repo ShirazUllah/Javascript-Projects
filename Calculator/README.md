@@ -13,5 +13,3 @@ This is a simple calculator web application created using HTML, CSS, and JavaScr
 
 ## Contributing
 If you'd like to contribute to the project, feel free to open an issue or submit a pull request.
-
-License
