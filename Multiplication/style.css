@@ -18,6 +18,24 @@ body {
     box-shadow: 5px 6px 5px rgba(0, 0, 0, 0.3);
 }
 
+.feedback {
+    font-size: 18px;
+    margin-top: 10px;
+    font-weight: bold;
+    height: 24px;
+    color: green;
+    /* Keep space even when empty */
+    transition: color 0.3s ease;
+}
+
+.feedback.correct {
+    color: green;
+}
+
+.feedback.incorrect {
+    color: red;
+}
+
 
 .input {
     display: block;
@@ -28,6 +46,7 @@ body {
     font-size: 20px;
     border: 2px solid rgb(37, 24, 24);
     color: #525e74;
+    margin-top: 10px;
 }
 
 .input::placeholder {
@@ -71,4 +90,13 @@ body {
     position: absolute;
     bottom: 0;
     padding: 10px 0;
+}
+
+.reset-btn {
+    background-color: #e53935;
+    margin-top: 5px;
+}
+
+.reset-btn:hover {
+    filter: brightness(0.9);
 }

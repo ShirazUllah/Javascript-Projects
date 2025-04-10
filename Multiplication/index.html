@@ -1,30 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--  -->
+    <link rel="stylesheet" href="style.css" />
 
-  <!--  -->
-  <link rel="stylesheet" href="style.css">
+    <!--  -->
+    <script src="app.js" defer></script>
+    <title>Multiplcation App</title>
+  </head>
 
-  <!--  -->
-  <script src="app.js" defer></script>
-  <title>Multiplcation App</title>
-</head>
-
-<body>
-  <form class="form" id="form">
-    <h4 class="score" id="score">Score : 0</h4>
-    <h1 id="question">What is 1 multiply by 1</h1>
-    <input type="text" class="input" id="input" placeholder="Enter your answer" autofocus autocomplete="off">
-    <button type="submit" class="btn">Submit</button>
-
-  </form>
-  <footer class="footer">
-    <p>© 2024 Shiraz Ullah. All Rights Reserved | Terms and Conditions</p>
-  </footer>
-</body>
-
+  <body>
+    <form class="form" id="form">
+      <h4 class="score" id="score">Score : 0</h4>
+      <h1 id="question">What is 1 multiply by 1</h1>
+      <div id="feedback" class="feedback"></div>
+      <input
+        type="text"
+        class="input"
+        id="input"
+        placeholder="Enter your answer"
+        autofocus
+        autocomplete="off"
+      />
+      <button type="submit" class="btn">Submit</button>
+      <button type="button" class="btn reset-btn" id="resetBtn">
+        Reset Score
+      </button>
+    </form>
+    <footer class="footer">
+      <p>© 2025 codewithshiree. All Rights Reserved | Terms and Conditions</p>
+    </footer>
+  </body>
 </html>
