@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catch the Falling Stars</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="theme-toggle" id="themeToggle">🌙</div>
+
+    <div class="scoreboard">
+      <span id="score">Score: 0</span>
+      <span id="time">Time: 60s</span>
+      <span id="highScore">High Score: 0</span>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+      <div class="overlay" id="startOverlay">
+        <h1>Catch the Falling Stars!</h1>
+        <p>Use arrow keys to move your basket</p>
+        <button id="startBtn">Click "Play" to start!</button>
+      </div>
+
+      <div class="overlay hidden" id="endOverlay">
+        <h2>Game Over!</h2>
+        <p id="finalScoreText"></p>
+        <button id="restartBtn">Play Again</button>
+      </div>
+
+      <img id="basket" class="basket" src="basket.png" alt="Basket" />
+    </div>
+
+    <div class="controls">
+      <button id="resetBtn">Reset</button>
+      <button id="stopBtn">Stop</button>
+      <p>Use ← → arrow keys to move the basket</p>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

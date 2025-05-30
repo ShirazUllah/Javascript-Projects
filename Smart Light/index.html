@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Light Control</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        height: 100vh;
+        overflow: hidden;
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      body.lights-off {
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      }
+
+      body.lights-on {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      }
+
+      body.lights-dim {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        padding: 40px 30px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+        max-width: 350px;
+        width: 90%;
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+      }
+
+      .container.lights-off {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .project-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        opacity: 0;
+        animation: fadeInDown 1s ease-out 0.2s forwards;
+      }
+
+      .project-title span {
+        display: inline-block;
+        animation: bounce 2s infinite;
+      }
+
+      .project-title span:nth-child(1) {
+        animation-delay: 0s;
+      }
+      .project-title span:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .project-title span:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+      .project-title span:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+      .project-title span:nth-child(5) {
+        animation-delay: 0.4s;
+      }
+      .project-title span:nth-child(6) {
+        animation-delay: 0.5s;
+      }
+
+      .bulb-container {
+        position: relative;
+        margin: 0 auto 40px;
+        width: 120px;
+        height: 120px;
+        opacity: 0;
+        animation: zoomIn 1s ease-out 0.4s forwards;
+      }
+
+      .bulb {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+        border-radius: 50%;
+        position: relative;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1),
+          inset 0 -5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-origin: center;
+      }
+
+      .bulb.on {
+        background: linear-gradient(145deg, #fff8dc, #ffeb3b);
+        box-shadow: 0 0 60px rgba(255, 235, 59, 0.8),
+          0 0 120px rgba(255, 235, 59, 0.6), 0 0 180px rgba(255, 235, 59, 0.4),
+          0 15px 35px rgba(0, 0, 0, 0.2),
+          inset 0 -5px 15px rgba(255, 193, 7, 0.3);
+        transform: scale(1.1);
+        filter: brightness(1.4);
+      }
+
+      .bulb.dim {
+        background: linear-gradient(145deg, #f0f8ff, #e6f3ff);
+        box-shadow: 0 0 30px rgba(173, 216, 230, 0.6),
+          0 0 60px rgba(173, 216, 230, 0.4), 0 15px 35px rgba(0, 0, 0, 0.2),
+          inset 0 -5px 15px rgba(173, 216, 230, 0.3);
+        transform: scale(1.05);
+        filter: brightness(0.8);
+      }
+
+      .bulb.off {
+        background: linear-gradient(145deg, #495057, #6c757d);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3),
+          inset 0 -5px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .filament {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 60px;
+        opacity: 0.4;
+        transition: all 0.6s ease;
+      }
+
+      .filament::before,
+      .filament::after {
+        content: "";
+        position: absolute;
+        width: 2px;
+        height: 30px;
+        background: #666;
+        border-radius: 2px;
+        transition: all 0.6s ease;
+      }
+
+      .filament::before {
+        left: 12px;
+        transform: rotate(-15deg);
+      }
+
+      .filament::after {
+        right: 12px;
+        transform: rotate(15deg);
+      }
+
+      .bulb.on .filament::before,
+      .bulb.on .filament::after {
+        background: #ff4500;
+        box-shadow: 0 0 15px #ff4500, 0 0 30px #ff6b35;
+      }
+
+      .bulb.dim .filament::before,
+      .bulb.dim .filament::after {
+        background: #87ceeb;
+        box-shadow: 0 0 10px #87ceeb, 0 0 20px #add8e6;
+      }
+
+      .base {
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 20px;
+        background: linear-gradient(145deg, #adb5bd, #6c757d);
+        border-radius: 0 0 10px 10px;
+        transition: all 0.6s ease;
+      }
+
+      .base::before {
+        content: "";
+        position: absolute;
+        top: -5px;
+        left: 10px;
+        right: 10px;
+        height: 3px;
+        background: #495057;
+        border-radius: 2px;
+      }
+
+      .base::after {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: 10px;
+        right: 10px;
+        height: 3px;
+        background: #495057;
+        border-radius: 2px;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 0.6s forwards;
+      }
+
+      .btn {
+        padding: 15px 25px;
+        border: none;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        transform: translateY(20px);
+        opacity: 0;
+        animation: slideUp 0.8s ease-out forwards;
+      }
+
+      .btn:nth-child(1) {
+        animation-delay: 0.8s;
+      }
+      .btn:nth-child(2) {
+        animation-delay: 1s;
+      }
+      .btn:nth-child(3) {
+        animation-delay: 1.2s;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn-on {
+        background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+        color: white;
+        box-shadow: 0 8px 25px rgba(0, 210, 255, 0.3);
+      }
+
+      .btn-on:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(0, 210, 255, 0.4);
+      }
+
+      .btn-on:active {
+        transform: translateY(-1px);
+      }
+
+      .btn-off {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+      }
+
+      .btn-off:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+      }
+
+      .btn-off:active {
+        transform: translateY(-1px);
+      }
+
+      .btn-dim {
+        background: linear-gradient(135deg, #a8edea, #fed6e3);
+        color: #333;
+        box-shadow: 0 8px 25px rgba(168, 237, 234, 0.3);
+      }
+
+      .btn-dim:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(168, 237, 234, 0.4);
+      }
+
+      .btn-dim:active {
+        transform: translateY(-1px);
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn:disabled:hover {
+        transform: none;
+      }
+
+      .light-rays {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+        transition: all 0.6s ease;
+        pointer-events: none;
+      }
+
+      .light-rays.active {
+        opacity: 1;
+        animation: rotate 4s linear infinite;
+      }
+
+      .light-rays.dim {
+        opacity: 0.5;
+        animation: rotate 6s linear infinite;
+      }
+
+      .ray {
+        position: absolute;
+        width: 2px;
+        height: 100px;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 235, 59, 0.8),
+          transparent
+        );
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        transform-origin: center bottom;
+      }
+
+      .light-rays.dim .ray {
+        background: linear-gradient(
+          to bottom,
+          rgba(173, 216, 230, 0.6),
+          transparent
+        );
+      }
+
+      .ray:nth-child(1) {
+        transform: translateX(-50%) rotate(0deg);
+      }
+      .ray:nth-child(2) {
+        transform: translateX(-50%) rotate(45deg);
+      }
+      .ray:nth-child(3) {
+        transform: translateX(-50%) rotate(90deg);
+      }
+      .ray:nth-child(4) {
+        transform: translateX(-50%) rotate(135deg);
+      }
+      .ray:nth-child(5) {
+        transform: translateX(-50%) rotate(180deg);
+      }
+      .ray:nth-child(6) {
+        transform: translateX(-50%) rotate(225deg);
+      }
+      .ray:nth-child(7) {
+        transform: translateX(-50%) rotate(270deg);
+      }
+      .ray:nth-child(8) {
+        transform: translateX(-50%) rotate(315deg);
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes zoomIn {
+        from {
+          opacity: 0;
+          transform: scale(0.3);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-10px);
+        }
+        60% {
+          transform: translateY(-5px);
+        }
+      }
+
+      @keyframes rotate {
+        from {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        to {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1.1);
+        }
+        50% {
+          transform: scale(1.15);
+        }
+        100% {
+          transform: scale(1.1);
+        }
+      }
+
+      @keyframes dimPulse {
+        0% {
+          transform: scale(1.05);
+        }
+        50% {
+          transform: scale(1.08);
+        }
+        100% {
+          transform: scale(1.05);
+        }
+      }
+
+      .bulb.on {
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      .bulb.dim {
+        animation: dimPulse 3s ease-in-out infinite;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 480px) {
+        .project-title {
+          font-size: 24px;
+          letter-spacing: 2px;
+          top: 60px;
+        }
+
+        .container {
+          padding: 30px 20px;
+          max-width: 320px;
+          margin-top: 40px;
+        }
+
+        .bulb-container {
+          width: 100px;
+          height: 100px;
+        }
+
+        .btn {
+          padding: 12px 20px;
+          font-size: 14px;
+        }
+      }
+
+      @media (max-height: 600px) {
+        .project-title {
+          font-size: 20px;
+          top: 30px;
+        }
+
+        .container {
+          padding: 25px 20px;
+          margin-top: 20px;
+        }
+
+        .bulb-container {
+          margin-bottom: 25px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="project-title">
+      <span>S</span><span>M</span><span>A</span><span>R</span><span>T</span>
+      <span>L</span><span>I</span><span>G</span><span>H</span><span>T</span>
+    </div>
+
+    <div class="container">
+      <div class="bulb-container">
+        <div class="light-rays">
+          <div class="ray"></div>
+          <div class="ray"></div>
+          <div class="ray"></div>
+          <div class="ray"></div>
+          <div class="ray"></div>
+          <div class="ray"></div>
+          <div class="ray"></div>
+          <div class="ray"></div>
+        </div>
+        <div class="bulb" id="bulb">
+          <div class="filament"></div>
+          <div class="base"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-on" id="turnOn">💡 Turn On Light</button>
+        <button class="btn btn-off" id="turnOff">🔌 Turn Off Light</button>
+        <button class="btn btn-dim" id="dimLight">🌙 Dim Light</button>
+      </div>
+    </div>
+
+    <script>
+      class SmartLightController {
+        constructor() {
+          this.bulb = document.getElementById("bulb");
+          this.lightRays = document.querySelector(".light-rays");
+          this.container = document.querySelector(".container");
+          this.body = document.body;
+
+          this.turnOnBtn = document.getElementById("turnOn");
+          this.turnOffBtn = document.getElementById("turnOff");
+          this.dimBtn = document.getElementById("dimLight");
+
+          this.state = "off"; // 'off', 'on', 'dim'
+
+          this.init();
+        }
+
+        init() {
+          // Add event listeners with throttling for better performance
+          this.turnOnBtn.addEventListener(
+            "click",
+            this.throttle(() => this.turnOn(), 300)
+          );
+          this.turnOffBtn.addEventListener(
+            "click",
+            this.throttle(() => this.turnOff(), 300)
+          );
+          this.dimBtn.addEventListener(
+            "click",
+            this.throttle(() => this.dimLight(), 300)
+          );
+
+          // Initial state
+          this.updateUI();
+        }
+
+        throttle(func, limit) {
+          let inThrottle;
+          return function () {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+              func.apply(context, args);
+              inThrottle = true;
+              setTimeout(() => (inThrottle = false), limit);
+            }
+          };
+        }
+
+        turnOn() {
+          if (this.state === "on") return;
+
+          this.state = "on";
+          this.updateUI();
+          this.addRippleEffect(this.turnOnBtn);
+        }
+
+        turnOff() {
+          if (this.state === "off") return;
+
+          this.state = "off";
+          this.updateUI();
+          this.addRippleEffect(this.turnOffBtn);
+        }
+
+        dimLight() {
+          if (this.state === "dim") return;
+
+          this.state = "dim";
+          this.updateUI();
+          this.addRippleEffect(this.dimBtn);
+        }
+
+        updateUI() {
+          // Use requestAnimationFrame for smooth animations
+          requestAnimationFrame(() => {
+            // Reset all classes
+            this.bulb.className = "bulb";
+            this.lightRays.className = "light-rays";
+            this.body.className = "";
+            this.container.className = "container";
+
+            // Reset inline styles
+            this.bulb.style.filter = "";
+            this.lightRays.style.opacity = "";
+
+            // Update button states
+            this.updateButtonStates();
+
+            // Apply new state
+            switch (this.state) {
+              case "on":
+                this.bulb.classList.add("on");
+                this.lightRays.classList.add("active");
+                this.body.classList.add("lights-on");
+                this.container.classList.add("lights-on");
+                break;
+              case "off":
+                this.bulb.classList.add("off");
+                this.body.classList.add("lights-off");
+                this.container.classList.add("lights-off");
+                break;
+              case "dim":
+                this.bulb.classList.add("dim");
+                this.lightRays.classList.add("dim");
+                this.body.classList.add("lights-dim");
+                this.container.classList.add("lights-dim");
+                break;
+            }
+          });
+        }
+
+        updateButtonStates() {
+          // Reset all buttons
+          [this.turnOnBtn, this.turnOffBtn, this.dimBtn].forEach((btn) => {
+            btn.disabled = false;
+            btn.style.opacity = "1";
+          });
+
+          // Disable current state button
+          switch (this.state) {
+            case "on":
+              this.turnOnBtn.disabled = true;
+              this.turnOnBtn.style.opacity = "0.6";
+              break;
+            case "off":
+              this.turnOffBtn.disabled = true;
+              this.turnOffBtn.style.opacity = "0.6";
+              break;
+            case "dim":
+              this.dimBtn.disabled = true;
+              this.dimBtn.style.opacity = "0.6";
+              break;
+          }
+        }
+
+        addRippleEffect(button) {
+          const ripple = document.createElement("span");
+          const rect = button.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+
+          ripple.style.width = ripple.style.height = size + "px";
+          ripple.style.left = "50%";
+          ripple.style.top = "50%";
+          ripple.style.transform = "translate(-50%, -50%)";
+          ripple.style.position = "absolute";
+          ripple.style.background = "rgba(255, 255, 255, 0.6)";
+          ripple.style.borderRadius = "50%";
+          ripple.style.pointerEvents = "none";
+          ripple.style.animation = "ripple 0.6s ease-out";
+
+          button.appendChild(ripple);
+
+          setTimeout(() => {
+            ripple.remove();
+          }, 600);
+        }
+      }
+
+      // Add ripple animation CSS
+      const style = document.createElement("style");
+      style.textContent = `
+            @keyframes ripple {
+                from {
+                    transform: translate(-50%, -50%) scale(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translate(-50%, -50%) scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+      document.head.appendChild(style);
+
+      // Initialize the controller when DOM is loaded
+      document.addEventListener("DOMContentLoaded", () => {
+        new SmartLightController();
+      });
+
+      // Prevent scrolling and optimize performance
+      document.addEventListener(
+        "touchmove",
+        (e) => {
+          e.preventDefault();
+        },
+        { passive: false }
+      );
+
+      // Preload animations for better performance
+      document.addEventListener("DOMContentLoaded", () => {
+        const preloadAnimations = document.createElement("div");
+        preloadAnimations.style.cssText = `
+                position: absolute;
+                left: -9999px;
+                animation: pulse 0.1s, rotate 0.1s, bounce 0.1s;
+            `;
+        document.body.appendChild(preloadAnimations);
+        setTimeout(() => preloadAnimations.remove(), 100);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Auth Form</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary-color: #6c5ce7;
+        --secondary-color: #a29bfe;
+        --success-color: #00b894;
+        --error-color: #e17055;
+        --warning-color: #fdcb6e;
+        --light-bg: #f8f9fa;
+        --light-text: #2d3436;
+        --light-card: #ffffff;
+        --light-border: #e9ecef;
+        --dark-bg: #1a1d29;
+        --dark-text: #ffffff;
+        --dark-card: #252a3a;
+        --dark-border: #3a4052;
+        --shadow-light: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.3);
+        --transition: all 0.3s ease;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        transition: var(--transition);
+        padding: 20px;
+      }
+
+      body.light-theme {
+        background: linear-gradient(135deg, #74b9ff, #0984e3);
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: var(--transition);
+        z-index: 1000;
+        box-shadow: var(--shadow-light);
+      }
+
+      .theme-toggle.light {
+        background: var(--light-card);
+        color: var(--light-text);
+      }
+
+      .theme-toggle.dark {
+        background: var(--dark-card);
+        color: var(--dark-text);
+      }
+
+      .theme-toggle:hover {
+        transform: scale(1.1);
+      }
+
+      .container {
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+      }
+
+      .form-card {
+        border-radius: 20px;
+        padding: 40px 30px;
+        box-shadow: var(--shadow-dark);
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition);
+      }
+
+      .form-card.light {
+        background: var(--light-card);
+        color: var(--light-text);
+      }
+
+      .form-card.dark {
+        background: var(--dark-card);
+        color: var(--dark-text);
+      }
+
+      .form-content {
+        position: relative;
+        z-index: 10;
+      }
+
+      .login-form {
+        display: block;
+      }
+
+      .register-form {
+        display: none;
+      }
+
+      .register-form.active {
+        display: block;
+      }
+
+      .login-form.hidden {
+        display: none;
+      }
+
+      .form-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .form-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .form-subtitle {
+        opacity: 0.7;
+        font-size: 0.9rem;
+      }
+
+      .form-group {
+        position: relative;
+        margin-bottom: 25px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 15px 50px 15px 15px;
+        border: 2px solid transparent;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        position: relative;
+        z-index: 5;
+      }
+
+      .form-input.light {
+        background: var(--light-bg);
+        color: var(--light-text);
+        border-color: var(--light-border);
+      }
+
+      .form-input.dark {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--dark-text);
+        border-color: var(--dark-border);
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+      }
+
+      .form-input.valid {
+        border-color: var(--success-color);
+      }
+
+      .form-input.invalid {
+        border-color: var(--error-color);
+      }
+
+      .input-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.1rem;
+        transition: var(--transition);
+        z-index: 10;
+        cursor: pointer;
+      }
+
+      .input-icon.success {
+        color: var(--success-color);
+      }
+
+      .input-icon.error {
+        color: var(--error-color);
+      }
+
+      .password-toggle {
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .error-message {
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        font-size: 0.8rem;
+        color: var(--error-color);
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: var(--transition);
+      }
+
+      .error-message.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        font-size: 0.9rem;
+      }
+
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .checkbox-container input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+      }
+
+      .forgot-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .forgot-link:hover {
+        text-decoration: underline;
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        transition: var(--transition);
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+      }
+
+      .submit-btn:active {
+        transform: translateY(0);
+      }
+
+      .submit-btn.loading {
+        pointer-events: none;
+      }
+
+      .btn-spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid transparent;
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+      }
+
+      .submit-btn.loading .btn-spinner {
+        display: inline-block;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .form-switch {
+        text-align: center;
+        font-size: 0.9rem;
+      }
+
+      .switch-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .switch-link:hover {
+        text-decoration: underline;
+      }
+
+      .floating-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      .shape {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .shape:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+      }
+
+      .shape:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        top: 70%;
+        right: 10%;
+        animation-delay: 2s;
+      }
+
+      .shape:nth-child(3) {
+        width: 40px;
+        height: 40px;
+        bottom: 20%;
+        left: 20%;
+        animation-delay: 4s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          max-width: 350px;
+        }
+
+        .form-card {
+          padding: 30px 20px;
+        }
+
+        .form-title {
+          font-size: 1.8rem;
+        }
+
+        .form-options {
+          flex-direction: column;
+          gap: 15px;
+          align-items: flex-start;
+        }
+      }
+
+      .strength-meter {
+        margin-top: 8px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+        opacity: 0;
+        transition: var(--transition);
+      }
+
+      .strength-meter.show {
+        opacity: 1;
+      }
+
+      .strength-fill {
+        height: 100%;
+        transition: var(--transition);
+        border-radius: 2px;
+      }
+
+      .strength-weak {
+        background: var(--error-color);
+        width: 33%;
+      }
+      .strength-medium {
+        background: var(--warning-color);
+        width: 66%;
+      }
+      .strength-strong {
+        background: var(--success-color);
+        width: 100%;
+      }
+
+      /* Form transition animations */
+      .form-content {
+        animation: slideIn 0.5s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body class="dark-theme">
+    <button class="theme-toggle dark" onclick="toggleTheme()">🌙</button>
+
+    <div class="container">
+      <div class="form-card dark" id="formCard">
+        <div class="floating-shapes">
+          <div class="shape"></div>
+          <div class="shape"></div>
+          <div class="shape"></div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="form-content login-form" id="loginForm">
+          <div class="form-header">
+            <h2 class="form-title">Welcome Back</h2>
+            <p class="form-subtitle">Sign in to your account</p>
+          </div>
+
+          <form id="loginFormElement">
+            <div class="form-group">
+              <input
+                type="email"
+                class="form-input dark"
+                placeholder="Email Address"
+                id="loginEmail"
+                required
+                autocomplete="email"
+              />
+              <span class="input-icon" id="loginEmailIcon">📧</span>
+              <div class="error-message" id="loginEmailError"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="password"
+                class="form-input dark"
+                placeholder="Password"
+                id="loginPassword"
+                required
+                autocomplete="current-password"
+              />
+              <span
+                class="input-icon password-toggle"
+                id="loginPasswordIcon"
+                onclick="togglePassword('loginPassword', 'loginPasswordIcon')"
+                >👁️</span
+              >
+              <div class="error-message" id="loginPasswordError"></div>
+            </div>
+
+            <div class="form-options">
+              <label class="checkbox-container">
+                <input type="checkbox" id="rememberMe" />
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="submit-btn">
+              <div class="btn-spinner"></div>
+              Sign In
+            </button>
+          </form>
+
+          <div class="form-switch">
+            Don't have an account?
+            <span class="switch-link" onclick="switchToRegister()"
+              >Register</span
+            >
+          </div>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-content register-form" id="registerForm">
+          <div class="form-header">
+            <h2 class="form-title">Create Account</h2>
+            <p class="form-subtitle">Join us today</p>
+          </div>
+
+          <form id="registerFormElement">
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-input dark"
+                placeholder="First Name"
+                id="firstName"
+                required
+                autocomplete="given-name"
+              />
+              <span class="input-icon" id="firstNameIcon">👤</span>
+              <div class="error-message" id="firstNameError"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-input dark"
+                placeholder="Last Name"
+                id="lastName"
+                required
+                autocomplete="family-name"
+              />
+              <span class="input-icon" id="lastNameIcon">👤</span>
+              <div class="error-message" id="lastNameError"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="email"
+                class="form-input dark"
+                placeholder="Email Address"
+                id="registerEmail"
+                required
+                autocomplete="email"
+              />
+              <span class="input-icon" id="registerEmailIcon">📧</span>
+              <div class="error-message" id="registerEmailError"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="password"
+                class="form-input dark"
+                placeholder="Password"
+                id="registerPassword"
+                required
+                autocomplete="new-password"
+              />
+              <span
+                class="input-icon password-toggle"
+                id="registerPasswordIcon"
+                onclick="togglePassword('registerPassword', 'registerPasswordIcon')"
+                >👁️</span
+              >
+              <div class="strength-meter" id="strengthMeter">
+                <div class="strength-fill" id="strengthFill"></div>
+              </div>
+              <div class="error-message" id="registerPasswordError"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="password"
+                class="form-input dark"
+                placeholder="Confirm Password"
+                id="confirmPassword"
+                required
+                autocomplete="new-password"
+              />
+              <span class="input-icon" id="confirmPasswordIcon">🔒</span>
+              <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+              <div class="btn-spinner"></div>
+              Create Account
+            </button>
+          </form>
+
+          <div class="form-switch">
+            Already have an account?
+            <span class="switch-link" onclick="switchToLogin()">Sign In</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Theme Management
+      let isDarkTheme = true;
+
+      function toggleTheme() {
+        isDarkTheme = !isDarkTheme;
+        const body = document.body;
+        const themeToggle = document.querySelector(".theme-toggle");
+        const formCard = document.querySelector(".form-card");
+        const formInputs = document.querySelectorAll(".form-input");
+
+        if (isDarkTheme) {
+          body.className = "dark-theme";
+          themeToggle.className = "theme-toggle dark";
+          themeToggle.textContent = "🌙";
+          formCard.className = "form-card dark";
+          formInputs.forEach((input) => {
+            input.className = input.className.replace("light", "dark");
+          });
+        } else {
+          body.className = "light-theme";
+          themeToggle.className = "theme-toggle light";
+          themeToggle.textContent = "☀️";
+          formCard.className = "form-card light";
+          formInputs.forEach((input) => {
+            input.className = input.className.replace("dark", "light");
+          });
+        }
+      }
+
+      // Form Switching
+      function switchToRegister() {
+        const loginForm = document.getElementById("loginForm");
+        const registerForm = document.getElementById("registerForm");
+
+        loginForm.classList.add("hidden");
+        registerForm.classList.add("active");
+
+        // Focus on first input after animation
+        setTimeout(() => {
+          document.getElementById("firstName").focus();
+        }, 100);
+      }
+
+      function switchToLogin() {
+        const loginForm = document.getElementById("loginForm");
+        const registerForm = document.getElementById("registerForm");
+
+        registerForm.classList.remove("active");
+        loginForm.classList.remove("hidden");
+
+        // Focus on first input after animation
+        setTimeout(() => {
+          document.getElementById("loginEmail").focus();
+        }, 100);
+      }
+
+      // Password Toggle
+      function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (input.type === "password") {
+          input.type = "text";
+          icon.textContent = "🙈";
+        } else {
+          input.type = "password";
+          icon.textContent = "👁️";
+        }
+      }
+
+      // Validation Functions
+      function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+
+      function validateName(name) {
+        return name.trim().length >= 2;
+      }
+
+      function validatePassword(password) {
+        return password.length >= 8;
+      }
+
+      function getPasswordStrength(password) {
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+        if (/\d/.test(password)) strength++;
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+        return strength;
+      }
+
+      function showError(inputId, iconId, errorId, message) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        const error = document.getElementById(errorId);
+
+        if (input && icon && error) {
+          input.classList.add("invalid");
+          input.classList.remove("valid");
+          icon.classList.add("error");
+          icon.classList.remove("success");
+          error.textContent = message;
+          error.classList.add("show");
+        }
+      }
+
+      function showSuccess(inputId, iconId, errorId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        const error = document.getElementById(errorId);
+
+        if (input && icon && error) {
+          input.classList.add("valid");
+          input.classList.remove("invalid");
+          icon.classList.add("success");
+          icon.classList.remove("error");
+          error.classList.remove("show");
+        }
+      }
+
+      function clearValidation(inputId, iconId, errorId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        const error = document.getElementById(errorId);
+
+        if (input && icon && error) {
+          input.classList.remove("valid", "invalid");
+          icon.classList.remove("success", "error");
+          error.classList.remove("show");
+        }
+      }
+
+      // Real-time Validation
+      document.addEventListener("DOMContentLoaded", function () {
+        // Login form validation
+        const loginEmail = document.getElementById("loginEmail");
+        const loginPassword = document.getElementById("loginPassword");
+
+        if (loginEmail) {
+          loginEmail.addEventListener("blur", function () {
+            if (this.value.trim() === "") {
+              clearValidation(
+                "loginEmail",
+                "loginEmailIcon",
+                "loginEmailError"
+              );
+            } else if (!validateEmail(this.value)) {
+              showError(
+                "loginEmail",
+                "loginEmailIcon",
+                "loginEmailError",
+                "Please enter a valid email address"
+              );
+            } else {
+              showSuccess("loginEmail", "loginEmailIcon", "loginEmailError");
+            }
+          });
+        }
+
+        if (loginPassword) {
+          loginPassword.addEventListener("blur", function () {
+            if (this.value.trim() === "") {
+              clearValidation(
+                "loginPassword",
+                "loginPasswordIcon",
+                "loginPasswordError"
+              );
+            } else if (!validatePassword(this.value)) {
+              showError(
+                "loginPassword",
+                "loginPasswordIcon",
+                "loginPasswordError",
+                "Password must be at least 8 characters"
+              );
+            } else {
+              showSuccess(
+                "loginPassword",
+                "loginPasswordIcon",
+                "loginPasswordError"
+              );
+            }
+          });
+        }
+
+        // Register form validation
+        const firstName = document.getElementById("firstName");
+        const lastName = document.getElementById("lastName");
+        const registerEmail = document.getElementById("registerEmail");
+        const registerPassword = document.getElementById("registerPassword");
+        const confirmPassword = document.getElementById("confirmPassword");
+
+        if (firstName) {
+          firstName.addEventListener("blur", function () {
+            if (this.value.trim() === "") {
+              clearValidation("firstName", "firstNameIcon", "firstNameError");
+            } else if (!validateName(this.value)) {
+              showError(
+                "firstName",
+                "firstNameIcon",
+                "firstNameError",
+                "First name must be at least 2 characters"
+              );
+            } else {
+              showSuccess("firstName", "firstNameIcon", "firstNameError");
+            }
+          });
+        }
+
+        if (lastName) {
+          lastName.addEventListener("blur", function () {
+            if (this.value.trim() === "") {
+              clearValidation("lastName", "lastNameIcon", "lastNameError");
+            } else if (!validateName(this.value)) {
+              showError(
+                "lastName",
+                "lastNameIcon",
+                "lastNameError",
+                "Last name must be at least 2 characters"
+              );
+            } else {
+              showSuccess("lastName", "lastNameIcon", "lastNameError");
+            }
+          });
+        }
+
+        if (registerEmail) {
+          registerEmail.addEventListener("blur", function () {
+            if (this.value.trim() === "") {
+              clearValidation(
+                "registerEmail",
+                "registerEmailIcon",
+                "registerEmailError"
+              );
+            } else if (!validateEmail(this.value)) {
+              showError(
+                "registerEmail",
+                "registerEmailIcon",
+                "registerEmailError",
+                "Please enter a valid email address"
+              );
+            } else {
+              showSuccess(
+                "registerEmail",
+                "registerEmailIcon",
+                "registerEmailError"
+              );
+            }
+          });
+        }
+
+        if (registerPassword) {
+          registerPassword.addEventListener("input", function () {
+            const strengthMeter = document.getElementById("strengthMeter");
+            const strengthFill = document.getElementById("strengthFill");
+
+            if (this.value.length > 0) {
+              strengthMeter.classList.add("show");
+              const strength = getPasswordStrength(this.value);
+
+              strengthFill.className = "strength-fill";
+              if (strength <= 1) {
+                strengthFill.classList.add("strength-weak");
+              } else if (strength <= 2) {
+                strengthFill.classList.add("strength-medium");
+              } else {
+                strengthFill.classList.add("strength-strong");
+              }
+            } else {
+              strengthMeter.classList.remove("show");
+            }
+          });
+
+          registerPassword.addEventListener("blur", function () {
+            if (this.value.trim() === "") {
+              clearValidation(
+                "registerPassword",
+                "registerPasswordIcon",
+                "registerPasswordError"
+              );
+            } else if (!validatePassword(this.value)) {
+              showError(
+                "registerPassword",
+                "registerPasswordIcon",
+                "registerPasswordError",
+                "Password must be at least 8 characters"
+              );
+            } else {
+              showSuccess(
+                "registerPassword",
+                "registerPasswordIcon",
+                "registerPasswordError"
+              );
+            }
+          });
+        }
+
+        if (confirmPassword) {
+          confirmPassword.addEventListener("blur", function () {
+            if (this.value.trim() === "") {
+              clearValidation(
+                "confirmPassword",
+                "confirmPasswordIcon",
+                "confirmPasswordError"
+              );
+            } else if (this.value !== registerPassword.value) {
+              showError(
+                "confirmPassword",
+                "confirmPasswordIcon",
+                "confirmPasswordError",
+                "Passwords do not match"
+              );
+            } else {
+              showSuccess(
+                "confirmPassword",
+                "confirmPasswordIcon",
+                "confirmPasswordError"
+              );
+            }
+          });
+        }
+      });
+
+      // Form Submission
+      document
+        .getElementById("loginFormElement")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const submitBtn = this.querySelector(".submit-btn");
+          submitBtn.classList.add("loading");
+
+          // Simulate API call
+          setTimeout(() => {
+            submitBtn.classList.remove("loading");
+            alert("Login successful! (This is a demo)");
+          }, 2000);
+        });
+
+      document
+        .getElementById("registerFormElement")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const submitBtn = this.querySelector(".submit-btn");
+          submitBtn.classList.add("loading");
+
+          // Simulate API call
+          setTimeout(() => {
+            submitBtn.classList.remove("loading");
+            alert("Registration successful! (This is a demo)");
+            switchToLogin();
+          }, 2000);
+        });
+    </script>
+  </body>
+</html>
